@@ -1,27 +1,24 @@
 import pandas as pd
 
 from sklearn import svm
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import recall_score, f1_score, precision_score
+from sklearn.model_selection import GridSearchCV
 
+def get_best_params():
+    print("Loading best params")
+    parameters = {'kernel':('linear', 'rbf'), 'C':[0.001, 0.01, 0.1, 1, 10], 'gamma': [0.001, 0.01, 0.1, 1]}
 
-df = pd.read_csv('./winequality-red.csv')
+    df = pd.read_csv('./winequality-red.csv')
 
-X = df[df.columns[:-1]].values
-y = df[df.columns[-1]]
-classes = y.unique()
-y = y.values
+    X = df[df.columns[:-1]].values
+    y = df[df.columns[-1]]
+    y = y.values
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+    svc = svm.SVC()
+    clf = GridSearchCV(svc, parameters, verbose=1, n_jobs=-1)
+    clf.fit(X, y)
 
-clf = svm.SVC()
+    print('Grid Search Results')
+    print(clf.cv_results_)
 
-clf.fit(X_train, y_train)
-
-y_score = clf.predict(X_test)
-
-precision = precision_score(y_test, y_score, average='micro')
-recall = recall_score(y_test, y_score, average='micro')
-f1 = f1_score(y_test, y_score, average='micro')
-
-print(f'Precision: {precision} - Recall: {recall} - F1: {f1}')
+    print(f'Best params: {clf.best_params_}')
+    return clf.best_params_
