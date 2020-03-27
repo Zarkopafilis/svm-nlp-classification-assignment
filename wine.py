@@ -10,8 +10,7 @@ def get_best_params():
     df = pd.read_csv('./winequality-red.csv')
 
     X = df[df.columns[:-1]].values
-    y = df[df.columns[-1]]
-    y = y.values
+    y = df[df.columns[-1]].values
 
     svc = svm.SVC()
     clf = GridSearchCV(svc, parameters, verbose=1, n_jobs=-1)
